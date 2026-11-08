@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,13 +9,457 @@
     <meta property="og:description" content="Applicazione mobile wireframe a due pagine per iPhone 13 mini in bianco e nero con navigazione avanti e indietro." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN per funzionamento 100% statico e compatibilità immediata con GitHub Pages -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #fafafa;
+        color: #000000;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* Griglia wireframe millimetrata di sfondo */
+      .wireframe-grid {
+        background-size: 24px 24px;
+        background-image: 
+          linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+      }
+
+      .wireframe-canvas-grid {
+        background-size: 16px 16px;
+        background-image: 
+          linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+      }
+
+      /* Stile pulsanti wireframe con ombreggiatura marcata e tick di registro */
+      .wireframe-btn {
+        box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+        transition: all 0.15s ease-in-out;
+      }
+
+      .wireframe-btn:hover {
+        box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
+        transform: translate(2px, 2px);
+      }
+
+      .wireframe-btn:active {
+        transform: scale(0.97) translate(2px, 2px);
+      }
+
+      /* Transizioni fluide schermate */
+      .screen-view {
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+      }
+    </style>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="min-h-screen w-full flex flex-col wireframe-grid">
+
+    <!-- Barra superiore del banco di lavoro Wireframe -->
+    <header class="w-full shrink-0 border-b border-black bg-white/95 backdrop-blur-sm z-40 px-4 md:px-8 py-3 flex items-center justify-between gap-4 select-none">
+      <!-- Info Progetto & Dispositivo -->
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 border-2 border-black flex items-center justify-center font-mono font-bold text-xs bg-black text-white">
+          W
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-sm font-bold tracking-tight">
+              PROTOTYPE // WIREFRAME
+            </span>
+            <span class="hidden sm:inline font-mono text-[11px] px-1.5 py-0.5 border border-black bg-neutral-100">
+              iPhone 13 mini (375 × 812)
+            </span>
+          </div>
+          <span class="font-mono text-[11px] text-neutral-500">
+            Formato mobile 19.5:9 • Stile Bianco &amp; Nero statico
+          </span>
+        </div>
+      </div>
+
+      <!-- Selettore rapido schermata -->
+      <div class="flex items-center gap-2">
+        <div class="flex items-center border border-black font-mono text-xs bg-white">
+          <button
+            id="tab-btn-1"
+            onclick="goToPage(1)"
+            class="px-3 py-1 cursor-pointer transition-colors bg-black text-white font-bold"
+            title="Passa a Pagina 1"
+          >
+            Pagina 1
+          </button>
+          <div class="w-[1px] h-4 bg-black"></div>
+          <button
+            id="tab-btn-2"
+            onclick="goToPage(2)"
+            class="px-3 py-1 cursor-pointer transition-colors hover:bg-neutral-100 text-black"
+            title="Passa a Pagina 2"
+          >
+            Pagina 2
+          </button>
+        </div>
+      </div>
+
+      <!-- Controlli visualizzazione -->
+      <div class="flex items-center gap-2">
+        <!-- Zoom -->
+        <div class="hidden md:flex items-center border border-neutral-300 font-mono text-xs bg-white">
+          <button
+            onclick="adjustZoom(-0.1)"
+            class="px-2 py-1 hover:bg-neutral-100 border-r border-neutral-300 font-bold"
+            title="Riduci zoom"
+          >
+            −
+          </button>
+          <span id="zoom-label" class="px-2 py-1 text-[11px] text-neutral-700 w-12 text-center tabular-nums">
+            90%
+          </span>
+          <button
+            onclick="adjustZoom(0.1)"
+            class="px-2 py-1 hover:bg-neutral-100 border-l border-neutral-300 font-bold"
+            title="Aumenta zoom"
+          >
+            +
+          </button>
+        </div>
+
+        <!-- Toggle Griglia -->
+        <button
+          id="grid-toggle-btn"
+          onclick="toggleGrid()"
+          class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-black bg-neutral-100 font-medium transition-colors cursor-pointer"
+          title="Mostra / Nascondi Griglia Wireframe"
+        >
+          <span>Griglia</span>
+        </button>
+
+        <!-- Reset -->
+        <button
+          onclick="resetView()"
+          class="px-2.5 py-1 text-xs font-mono border border-neutral-300 hover:border-black text-neutral-600 hover:text-black transition-colors cursor-pointer bg-white"
+          title="Reimposta vista"
+        >
+          Reset
+        </button>
+      </div>
+    </header>
+
+    <!-- Area Principale di Lavoro con iPhone 13 mini centrato -->
+    <main class="flex-1 overflow-auto flex items-center justify-center p-4 md:p-8">
+      <div id="device-wrapper" class="transition-transform duration-200 origin-center" style="transform: scale(0.9);">
+        
+        <div class="relative flex items-center justify-center py-6 px-4">
+          <!-- Quote Wireframe - Altezza 812px -->
+          <div class="hidden lg:flex flex-col items-center justify-between absolute -left-12 top-6 bottom-6 w-8 text-neutral-400 font-mono text-[11px] select-none pointer-events-none">
+            <div class="w-full flex items-center justify-end">
+              <span class="w-3 h-[1px] bg-neutral-300"></span>
+            </div>
+            <div class="flex items-center gap-1.5 -rotate-90 origin-center whitespace-nowrap text-neutral-500">
+              <span>812 px</span>
+              <span class="text-[9px] text-neutral-400">(iPhone 13 mini)</span>
+            </div>
+            <div class="w-full flex items-center justify-end">
+              <span class="w-3 h-[1px] bg-neutral-300"></span>
+            </div>
+            <div class="absolute top-2 bottom-2 right-0 w-[1px] border-r border-dashed border-neutral-300"></div>
+          </div>
+
+          <!-- Quote Wireframe - Larghezza 375px -->
+          <div class="hidden lg:flex items-center justify-between absolute left-4 right-4 -top-3 h-6 text-neutral-400 font-mono text-[11px] select-none pointer-events-none max-w-[375px] mx-auto">
+            <span class="h-3 w-[1px] bg-neutral-300"></span>
+            <div class="flex items-center gap-1.5 text-neutral-500">
+              <span>375 px</span>
+            </div>
+            <span class="h-3 w-[1px] bg-neutral-300"></span>
+            <div class="absolute left-2 right-2 top-3 h-[1px] border-t border-dashed border-neutral-300"></div>
+          </div>
+
+          <!-- Chassis iPhone 13 mini -->
+          <div class="relative">
+            <!-- Pulsanti Hardware Laterali Sinistra (Mute, Vol+, Vol-) -->
+            <div class="absolute -left-[5px] top-[108px] w-[5px] h-[24px] bg-neutral-800 rounded-l-sm border border-neutral-900"></div>
+            <div class="absolute -left-[5px] top-[152px] w-[5px] h-[44px] bg-neutral-800 rounded-l-sm border border-neutral-900"></div>
+            <div class="absolute -left-[5px] top-[208px] w-[5px] h-[44px] bg-neutral-800 rounded-l-sm border border-neutral-900"></div>
+
+            <!-- Pulsante Hardware Laterale Destra (Power/Lock) -->
+            <div class="absolute -right-[5px] top-[160px] w-[5px] h-[64px] bg-neutral-800 rounded-r-sm border border-neutral-900"></div>
+
+            <!-- Corpo Telefono con Bezel -->
+            <div
+              class="relative w-[375px] h-[812px] bg-black rounded-[46px] p-[10px] shadow-[0_20px_50px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.1)] border border-neutral-800"
+              style="box-sizing: content-box;"
+            >
+              <!-- Schermo iPhone 13 mini (375 × 812 pt) -->
+              <div class="relative w-[375px] h-[812px] bg-white rounded-[38px] overflow-hidden flex flex-col border border-neutral-200">
+                
+                <!-- Barra di Stato iOS Wireframe -->
+                <div class="relative z-30 w-full h-[44px] shrink-0 flex items-center justify-between px-6 pt-1 text-black font-mono text-[12px] font-semibold select-none bg-transparent">
+                  <!-- Orario -->
+                  <span class="tracking-tight text-[13px]">9:41</span>
+
+                  <!-- Notch iPhone 13 mini (ridotto 125px) -->
+                  <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[125px] h-[26px] bg-black rounded-b-[18px] flex items-center justify-center">
+                    <!-- Speaker auricolare -->
+                    <div class="w-[42px] h-[3.5px] bg-neutral-800 rounded-full mb-1"></div>
+                    <!-- Foro fotocamera frontale -->
+                    <div class="absolute right-3.5 w-2.5 h-2.5 rounded-full border border-neutral-700 bg-neutral-900"></div>
+                  </div>
+
+                  <!-- Indicatori di stato (Segnale, Wi-Fi, Batteria) -->
+                  <div class="flex items-center gap-1.5 text-black">
+                    <!-- Segnale -->
+                    <div class="flex items-end gap-[1.5px] h-2.5" title="Segnale">
+                      <span class="w-[2.5px] h-[3px] bg-black"></span>
+                      <span class="w-[2.5px] h-[5px] bg-black"></span>
+                      <span class="w-[2.5px] h-[7px] bg-black"></span>
+                      <span class="w-[2.5px] h-[9px] bg-black"></span>
+                    </div>
+
+                    <!-- Wi-Fi -->
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                      <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3" />
+                    </svg>
+
+                    <!-- Batteria -->
+                    <div class="flex items-center gap-[1px]">
+                      <div class="w-5 h-2.5 border border-black rounded-[2px] p-[1px] flex items-center">
+                        <div class="h-full w-3.5 bg-black rounded-[1px]"></div>
+                      </div>
+                      <div class="w-[1.5px] h-1 bg-black rounded-r-[1px]"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CONTENUTO DELLE SCHERMATE -->
+                <div class="relative flex-1 w-full overflow-hidden bg-white">
+                  
+                  <!-- PAGINA 1: Schermata vuota con solo il bottone "avanti" -->
+                  <section
+                    id="page-1"
+                    class="screen-view w-full h-full flex flex-col items-center justify-center p-6 bg-white wireframe-canvas-grid select-none"
+                  >
+                    <div class="relative inline-flex flex-col items-center">
+                      <!-- Bottone avanti -->
+                      <button
+                        type="button"
+                        onclick="goToPage(2)"
+                        class="wireframe-btn group relative cursor-pointer select-none bg-white px-8 py-3.5 border-2 border-black text-black font-mono text-base font-semibold tracking-wide hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                        aria-label="avanti"
+                      >
+                        <span class="flex items-center gap-2">
+                          <span>avanti</span>
+                          <span class="text-lg transition-transform duration-150 group-hover:translate-x-1" aria-hidden="true">→</span>
+                        </span>
+
+                        <!-- Tacche di registro wireframe negli angoli -->
+                        <span class="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-black pointer-events-none"></span>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-black pointer-events-none"></span>
+                        <span class="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-black pointer-events-none"></span>
+                        <span class="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-black pointer-events-none"></span>
+                      </button>
+
+                      <!-- Micro-etichetta wireframe -->
+                      <span class="mt-2 font-mono text-[10px] text-neutral-400 select-none tracking-wider uppercase">
+                        [btn:avanti]
+                      </span>
+                    </div>
+                  </section>
+
+                  <!-- PAGINA 2: Schermata vuota con solo il bottone "indietro" -->
+                  <section
+                    id="page-2"
+                    class="screen-view hidden w-full h-full flex flex-col items-center justify-center p-6 bg-white wireframe-canvas-grid select-none"
+                  >
+                    <div class="relative inline-flex flex-col items-center">
+                      <!-- Bottone indietro -->
+                      <button
+                        type="button"
+                        onclick="goToPage(1)"
+                        class="wireframe-btn group relative cursor-pointer select-none bg-white px-8 py-3.5 border-2 border-black text-black font-mono text-base font-semibold tracking-wide hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                        aria-label="indietro"
+                      >
+                        <span class="flex items-center gap-2">
+                          <span class="text-lg transition-transform duration-150 group-hover:-translate-x-1" aria-hidden="true">←</span>
+                          <span>indietro</span>
+                        </span>
+
+                        <!-- Tacche di registro wireframe negli angoli -->
+                        <span class="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-black pointer-events-none"></span>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-black pointer-events-none"></span>
+                        <span class="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-black pointer-events-none"></span>
+                        <span class="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-black pointer-events-none"></span>
+                      </button>
+
+                      <!-- Micro-etichetta wireframe -->
+                      <span class="mt-2 font-mono text-[10px] text-neutral-400 select-none tracking-wider uppercase">
+                        [btn:indietro]
+                      </span>
+                    </div>
+                  </section>
+
+                </div>
+
+                <!-- Barra Home Indicator Inferiore -->
+                <div class="relative z-30 w-full h-[34px] shrink-0 flex items-center justify-center select-none bg-transparent pointer-events-none">
+                  <div class="w-[134px] h-[4px] bg-black rounded-full"></div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer Informativo -->
+    <footer class="w-full shrink-0 border-t border-neutral-300 bg-white/90 backdrop-blur-sm px-4 md:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-[11px] text-neutral-500 select-none">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full border border-black bg-black"></span>
+        <span>
+          Stato Attuale:
+          <strong id="footer-status-label" class="text-black font-semibold">
+            Pagina 1 (con solo bottone “avanti”)
+          </strong>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="hidden sm:inline">Navigazione rapida da tastiera: [←] [→]</span>
+        <span>Viewport: 375 × 812 pt</span>
+      </div>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT VANILLA STATICA (Nessun modulo o framework esterno) -->
+    <script>
+      var currentPage = 1;
+      var zoomScale = 0.9;
+      var isGridVisible = true;
+
+      // Funzione per navigare tra Pagina 1 e Pagina 2
+      function goToPage(pageNumber) {
+        if (pageNumber !== 1 && pageNumber !== 2) return;
+        currentPage = pageNumber;
+
+        var page1 = document.getElementById('page-1');
+        var page2 = document.getElementById('page-2');
+        var tabBtn1 = document.getElementById('tab-btn-1');
+        var tabBtn2 = document.getElementById('tab-btn-2');
+        var footerLabel = document.getElementById('footer-status-label');
+
+        if (pageNumber === 1) {
+          // Mostra Pagina 1, nascondi Pagina 2
+          page2.classList.add('hidden');
+          page1.classList.remove('hidden');
+
+          // Aggiorna bottoni barra superiore
+          tabBtn1.className = 'px-3 py-1 cursor-pointer transition-colors bg-black text-white font-bold';
+          tabBtn2.className = 'px-3 py-1 cursor-pointer transition-colors hover:bg-neutral-100 text-black';
+
+          // Aggiorna footer
+          if (footerLabel) {
+            footerLabel.textContent = 'Pagina 1 (con solo bottone “avanti”)';
+          }
+        } else {
+          // Mostra Pagina 2, nascondi Pagina 1
+          page1.classList.add('hidden');
+          page2.classList.remove('hidden');
+
+          // Aggiorna bottoni barra superiore
+          tabBtn1.className = 'px-3 py-1 cursor-pointer transition-colors hover:bg-neutral-100 text-black';
+          tabBtn2.className = 'px-3 py-1 cursor-pointer transition-colors bg-black text-white font-bold';
+
+          // Aggiorna footer
+          if (footerLabel) {
+            footerLabel.textContent = 'Pagina 2 (con solo bottone “indietro”)';
+          }
+        }
+      }
+
+      // Funzione per regolare lo zoom della visualizzazione
+      function adjustZoom(delta) {
+        zoomScale = Math.min(1.2, Math.max(0.65, Number((zoomScale + delta).toFixed(2))));
+        applyZoom();
+      }
+
+      function applyZoom() {
+        var wrapper = document.getElementById('device-wrapper');
+        var zoomLabel = document.getElementById('zoom-label');
+        if (wrapper) {
+          wrapper.style.transform = 'scale(' + zoomScale + ')';
+        }
+        if (zoomLabel) {
+          zoomLabel.textContent = Math.round(zoomScale * 100) + '%';
+        }
+      }
+
+      // Attiva / disattiva griglia millimetrata
+      function toggleGrid() {
+        isGridVisible = !isGridVisible;
+        var body = document.body;
+        var p1 = document.getElementById('page-1');
+        var p2 = document.getElementById('page-2');
+        var btn = document.getElementById('grid-toggle-btn');
+
+        if (isGridVisible) {
+          body.classList.add('wireframe-grid');
+          if (p1) p1.classList.add('wireframe-canvas-grid');
+          if (p2) p2.classList.add('wireframe-canvas-grid');
+          if (btn) btn.className = 'hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-black bg-neutral-100 font-medium transition-colors cursor-pointer';
+        } else {
+          body.classList.remove('wireframe-grid');
+          if (p1) p1.classList.remove('wireframe-canvas-grid');
+          if (p2) p2.classList.remove('wireframe-canvas-grid');
+          if (btn) btn.className = 'hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-neutral-300 text-neutral-500 hover:border-black transition-colors cursor-pointer';
+        }
+      }
+
+      // Reimposta visualizzazione
+      function resetView() {
+        goToPage(1);
+        zoomScale = 0.9;
+        applyZoom();
+      }
+
+      // Navigazione tramite tastiera (Tasti Freccia)
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' && currentPage === 1) {
+          goToPage(2);
+        } else if (e.key === 'ArrowLeft' && currentPage === 2) {
+          goToPage(1);
+        }
+      });
+
+      // Adattamento automatico iniziale dello zoom in base all'altezza dello schermo
+      window.addEventListener('resize', function() {
+        if (window.innerHeight < 920 && zoomScale > 0.82) {
+          zoomScale = 0.82;
+          applyZoom();
+        }
+      });
+
+      // Esegui calibrazione iniziale
+      if (window.innerHeight < 920) {
+        zoomScale = 0.82;
+        applyZoom();
+      }
+    </script>
   </body>
 </html>
-
